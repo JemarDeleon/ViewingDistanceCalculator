@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<div class="led-3d-simulator">
+  <h3>LED Viewing Distance Simulator</h3>
+
+  <label for="pixelPitch">Pixel Pitch (mm):</label>
+  <input type="number" id="pixelPitch" value="2.5" step="0.1" oninput="updateDiagram()" />
+
+  <div class="three-d-space">
+    <div class="floor"></div>
+
+    <!-- LED Screen Image -->
+    <img src="https://cdn.prod.website-files.com/67f7fd833d8f157da0adace1/6835b790390eeee3a36cdfd4_StandingIcon.png" 
+         alt="LED Screen" class="screen-img" />
+
+    <!-- Viewer Image -->
+    <img src="https://cdn.prod.website-files.com/67f7fd833d8f157da0adace1/687fe991d71045c845944d69_LEDVideoWallGraphic.webp" 
+         alt="Viewer" class="viewer-img" id="viewer3d" />
+
+    <!-- Distance Line -->
+    <div class="line-3d" id="line3d"></div>
+  </div>
+
+  <div class="labels-3d">
+    <span id="minLabel"></span>
+    <span id="optLabel"></span>
+  </div>
+
+  <div class="explanation" id="explanation"></div>
+</div>
+
+<style>
+  .led-3d-simulator {
+    font-family: 'Segoe UI', sans-serif;
+    max-width: 640px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e0e0e0;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .three-d-space {
+    position: relative;
+    height: 250px;
+    background: );
+    perspective: 800px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px dashed #ccc;
+  }
+
+  .floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: radial-gradient(ellipse at center, #b0b0b0 0%, #999999 100%);
+    transform: rotateX(60deg);
+    transform-origin: top;
+  }
+
+  .screen-img {
+    position: absolute;
+    bottom: 60px;
+    left: 60px;
+    width: 20px;
+    height: auto;
+    transform: rotateY(-4deg);
+    
+  }
+
+  .viewer-img {
+    position: absolute;
+    bottom: 97px;
+    width: 50px;
+    height: auto;
+    transition: left 0.3s ease;
+    transform: translateY(5px) scale(1.05);
+  }
+
+  .line-3d {
+  position: absolute;
+  bottom: 120px;
+  height: 0; /* Set height to 0 for a border line */
+  border-top: 2px dashed #444; /* Dashed line */
+  width: 100px; /* Default width (gets updated in script) */
+  transform-origin: left center;
+  transform: rotateY(-10deg);
+  transition: width 0.3s ease;
+  z-index: -1;
+  }
+
+  .labels-3d {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #333;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+
+  .explanation {
+    font-size: 15px;
+    background: #f5f5f5;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  function updateDiagram() {
+    const pitch = parseFloat(document.getElementById("pixelPitch").value);
+    if (isNaN(pitch) || pitch <= 0) return;
+
+    const minFeet = (pitch * 1.5 * 3.281).toFixed(1);
+    const optFeet = (pitch * 2.5 * 3.281).toFixed(1);
+
+    const scale = 6; // 1 foot = 6px (adjust if needed)
+    const optPx = pitch * 2.5 * 3.281 * scale;
+
+    const viewer = document.getElementById("viewer3d");
+    const line = document.getElementById("line3d");
+
+    viewer.style.left = `${optPx + 70}px`; // 70 = screen offset
+    line.style.left = `70px`;
+    line.style.width = `${optPx}px`;
+
+    document.getElementById("minLabel").textContent = `Min: ${minFeet} ft`;
+    document.getElementById("optLabel").textContent = `Optimal: ${optFeet} ft`;
+
+    document.getElementById("explanation").innerHTML = `
+      For a pixel pitch of <strong>${pitch}mm</strong>:<br>
+      • Minimum viewing distance: <strong>${minFeet} ft</strong><br>
+      • Optimal viewing distance: <strong>${optFeet} ft</strong><br><br>
+      This diagram illustrates how far a viewer should stand for clear image quality.
+    `;
+  }
+
+  updateDiagram();
+</script>
