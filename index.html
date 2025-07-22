@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 
+
 <div class="led-3d-simulator">
   <h3>LED Viewing Distance Simulator</h3>
 
   <label for="pixelPitch">Pixel Pitch (mm):</label>
   <input type="number" id="pixelPitch" value="2.5" step="0.1" oninput="updateDiagram()" />
   <div class="presets">
-  <strong>Commong LED Panel Pitches:<br></strong>
+  <strong>Common LED Panel Pixel Pitches:<br></strong>
   <button onclick="setPreset(1.2)">1.2mm</button>
   <button onclick="setPreset(1.5)">1.5mm</button>
   <button onclick="setPreset(2.5)">2.5mm</button>
@@ -155,27 +156,36 @@
 </style>
 
 <script>
-    function setPreset(value) {
-  document.getElementById("pixelPitch").value = value;
-  updateDiagram();
-}
+  function setPreset(value) {
+    document.getElementById("pixelPitch").value = value;
+    updateDiagram();
+  }
 
   function updateDiagram() {
     const pitch = parseFloat(document.getElementById("pixelPitch").value);
     if (isNaN(pitch) || pitch <= 0) return;
 
+    // Calculate distances
     const minFeet = (pitch * 1.5 * 3.281).toFixed(1);
-    const optFeet = (pitch * 2.5 * 3.281).toFixed(1);
+    const optFeetRaw = pitch * 2.5 * 3.281;
+    const optFeet = optFeetRaw.toFixed(1);
 
-    const scale = 6; // 1 foot = 6px (adjust if needed)
-    const optPx = pitch * 2.5 * 3.281 * scale;
+    // For diagram positioning
+    const scale = 6;
+    const optPx = optFeetRaw * scale;
 
     const viewer = document.getElementById("viewer3d");
     const line = document.getElementById("line3d");
 
-    viewer.style.left = `${optPx + 70}px`; // 70 = screen offset
+    viewer.style.left = `${optPx + 70}px`;
     line.style.left = `70px`;
     line.style.width = `${optPx}px`;
+
+    // 🎯 Estimate screen size for a full HD resolution (1920x1080)
+    const horizontalPixels = 1920;
+    const verticalPixels = 1080;
+    const screenWidthFeet = ((horizontalPixels * pitch) / 304.8).toFixed(1);
+    const screenHeightFeet = ((verticalPixels * pitch) / 304.8).toFixed(1);
 
     document.getElementById("minLabel").textContent = `Min: ${minFeet} ft`;
     document.getElementById("optLabel").textContent = `Optimal: ${optFeet} ft`;
@@ -184,7 +194,11 @@
       For a pixel pitch of <strong>${pitch}mm</strong>:<br>
       • Minimum viewing distance: <strong>${minFeet} ft</strong><br>
       • Optimal viewing distance: <strong>${optFeet} ft</strong><br><br>
-      This diagram illustrates how far a viewer should stand for clear image quality.
+      <strong>Hypothetical screen size referencing a 16:9 scale</strong><br>
+      • Width: <strong>${screenWidthFeet} ft</strong><br>
+      • Height: <strong>${screenHeightFeet} ft</strong><br><br>
+      This diagram illustrates how far a viewer should stand for optimal clarity,
+      and the screen dimensions typically required to support a full HD resolution at that pixel pitch.
     `;
   }
 
